@@ -6,14 +6,10 @@ var car = {
     },
     end : function(){
         console.log("Engine is End");
-    },
-    car_info : function(){
-        console.log(car.name + ", " + car.ph);
     }
 }
 
-console.log(car.name);
-console.log(car.ph);
-console.log(car.start());
-console.log(car.end());
-console.log(car.car_info());
+console.log(car.name)
+console.log(car.ph)
+car.start()
+car.end()
