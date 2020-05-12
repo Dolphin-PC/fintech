@@ -9,7 +9,6 @@ var car = {
 		console.log("engine is stoped");
 	}
 }
-
 var car2 = {
 	name : "bmw",
 	ph : "500ph",
@@ -30,7 +29,6 @@ var car3 = {
 		console.log("engine is stoped");
 	}
 }
-
 var car4 = {
 	name : "fait",
 	ph : "500ph",
@@ -41,7 +39,6 @@ var car4 = {
 		console.log("engine is stoped");
 	}
 }
-
 var car5 = {
 	name : "rx",
 	ph : "500ph",
