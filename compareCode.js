@@ -1,10 +1,9 @@
 const express = require('express')
 const app = express()
 const path = require('path')
+var jwt = require('jsonwebtoken');
 var request = require('request');
 var mysql = require('mysql');
-var jwt = require('jsonwebtoken');
-
 var auth = require('./lib/auth');
 
 app.set('views', path.join(__dirname, 'views')); // ejs file location
@@ -58,22 +57,24 @@ app.post('/getData', function(req, res){
     res.json(userData + "!!!!!")
 })
 
-app.post('/authTest',auth,function(req,res){
-    res.json(req.decoded)
+app.post('/authTest', auth, function(req, res){
+    res.json(req.decoded);
 })
+
 
 //------------------service start //
 app.get('/signup', function(req, res){
     res.render('signup');
 })
 
-app.get('/login',function(req,res){
+app.get('/login', function(req, res){
     res.render('login');
 })
 
-app.get('/main',function(req,res){
+app.get('/main', function(req, res){
     res.render('main');
 })
+
 
 app.get('/authResult', function(req, res){
     var authCode = req.query.code
@@ -86,8 +87,8 @@ app.get('/authResult', function(req, res){
         },
         form : {
             code : authCode,
-            client_id : 'HxTaO0dyeVPIepwel60gaJT2uCwCod8dwbWGH24m',
-            client_secret : 'XFoOqPP7IUOaW0H9VGwcdjtYZa25mc5KKl1yoeKC',
+            client_id : 'q7kH44ThJwjpvNRg0BbJvE1yxvx5X53DKz1rNgPF',
+            client_secret : 'yVT6irMr2h4ZTHzZY7sDpbvhm1nlOzr4nP7DYRVy',
             redirect_uri : 'http://localhost:3000/authResult',
             grant_type : 'authorization_code'
         }
@@ -107,23 +108,25 @@ app.get('/authResult', function(req, res){
 
 app.post('/signup', function(req, res){
     //data req get db store
-    var userName = req.body.userName
-    var userEmail = req.body.userEmail
-    var userPassword = req.body.userPassword
-    var userAccessToken = req.body.userAccessToken
-    var userRefreshToken = req.body.userRefreshToken
-    var userSeqNo = req.body.userSeqNo
-    console.log(userName, userEmail,userPassword,userAccessToken,userRefreshToken, userSeqNo);
+    var userName = req.body.userName;
+    var userEmail = req.body.userEmail;
+    var userPassword = req.body.userPassword;
+    var userAccessToken = req.body.userAccessToken;
+    var userRefreshToken = req.body.userRefreshToken;
+    var userSeqNo = req.body.userSeqNo;
+    console.log(userName, userAccessToken, userSeqNo);
     var sql = "INSERT INTO fintech.user (name, email, password, accesstoken, refreshtoken, userseqno) VALUES (?,?,?,?,?,?)"
-    connection.query(sql, // excute sql
-        [userName,userEmail,userPassword,userAccessToken,userRefreshToken,userSeqNo], // ? <- value
-        function(err,result){
+    connection.query(
+        sql, // excute sql
+        [userName, userEmail, userPassword, userAccessToken, userRefreshToken, userSeqNo], // ? <- value
+         function(err, result){
             if(err){
                 console.error(err);
                 res.json(0);
                 throw err;
-            }else{
-                res.json(1);
+            }
+            else {
+                res.json(1)
             }
     })
 })
@@ -173,15 +176,17 @@ app.post('/login', function(req, res){
     })
 })
 
-app.post('/list',function(req, res){
+app.post('/list', function(req, res){
+    //
+    // api response body 
     var option = {
         method : "GET",
         url : "https://testapi.openbanking.or.kr/v2.0/user/me",
         headers : {
-            Authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMTAwNzU4NzY3Iiwic2NvcGUiOlsiaW5xdWlyeSIsImxvZ2luIiwidHJhbnNmZXIiXSwiaXNzIjoiaHR0cHM6Ly93d3cub3BlbmJhbmtpbmcub3Iua3IiLCJleHAiOjE1OTcyMDkwNDIsImp0aSI6IjEyNTQ1NzQxLWFmYWUtNDY3OC1iYjJkLTdhNmQ0ZjY5MDViZSJ9.9h4CdtDV9ADHXbKmyvE5A4yq6JnqhyKDu49QYF0NHqk'
+            Authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMTAwMDM0NzM2Iiwic2NvcGUiOlsiaW5xdWlyeSIsImxvZ2luIiwidHJhbnNmZXIiXSwiaXNzIjoiaHR0cHM6Ly93d3cub3BlbmJhbmtpbmcub3Iua3IiLCJleHAiOjE1OTcxMzA3ODAsImp0aSI6IjFlNWYyYWZhLTQxMTAtNDRmMS1iYzJlLTcyNGVkMTcwNTQ0OCJ9.AqDnigHaLRrgx7twoCMEct_mHrAbW5pIo7xzh-2pLTQ'
         },
         qs : {
-            user_seq_no : "1100758767"
+            user_seq_no : "1100034736"
         }
     }
     request(option, function(err, response, body){
@@ -192,10 +197,10 @@ app.post('/list',function(req, res){
         else {
             var accessRequestResult = JSON.parse(body);
             console.log(accessRequestResult);
-            res.json(accessRequestResult);
+            res.json(accessRequestResult)
         }
     })
 })
 
-app.listen(3000)
 
+app.listen(3000)
