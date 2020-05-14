@@ -3,6 +3,7 @@ const app = express()
 const path = require('path')
 var request = require('request');
 var mysql = require('mysql');
+var jwt = require('jsonwebtoken');
 
 app.set('views', path.join(__dirname, 'views')); // ejs file location
 app.set('view engine', 'ejs'); //select view templet engine
@@ -61,6 +62,10 @@ app.get('/signup', function(req, res){
     res.render('signup');
 })
 
+app.get('/login',function(req,res){
+    res.render('login');
+})
+
 app.get('/authResult', function(req, res){
     var authCode = req.query.code
     console.log(authCode);
@@ -72,8 +77,8 @@ app.get('/authResult', function(req, res){
         },
         form : {
             code : authCode,
-            client_id : 'q7kH44ThJwjpvNRg0BbJvE1yxvx5X53DKz1rNgPF',
-            client_secret : 'yVT6irMr2h4ZTHzZY7sDpbvhm1nlOzr4nP7DYRVy',
+            client_id : 'HxTaO0dyeVPIepwel60gaJT2uCwCod8dwbWGH24m',
+            client_secret : 'XFoOqPP7IUOaW0H9VGwcdjtYZa25mc5KKl1yoeKC',
             redirect_uri : 'http://localhost:3000/authResult',
             grant_type : 'authorization_code'
         }
@@ -99,7 +104,62 @@ app.post('/signup', function(req, res){
     var userAccessToken = req.body.userAccessToken
     var userRefreshToken = req.body.userRefreshToken
     var userSeqNo = req.body.userSeqNo
-    console.log(userName, userAccessToken, userSeqNo);
+    console.log(userName, userEmail,userPassword,userAccessToken,userRefreshToken, userSeqNo);
+    var sql = "INSERT INTO fintech.user (name, email, password, accesstoken, refreshtoken, userseqno) VALUES (?,?,?,?,?,?)"
+    connection.query(sql, // excute sql
+        [userName,userEmail,userPassword,userAccessToken,userRefreshToken,userSeqNo], // ? <- value
+        function(err,result){
+            if(err){
+                console.error(err);
+                res.json(0);
+                throw err;
+            }else{
+                res.json(1);
+            }
+    })
+})
+
+app.post('/login', function(req, res){
+    var userEmail = req.body.userEmail;
+    var userPassword = req.body.userPassword;
+    var sql = "SELECT * FROM user WHERE email = ?";
+    connection.query(sql, [userEmail], function(err, result){
+        if(err){
+            console.error(err);
+            res.json(0);
+            throw err;
+        }
+        else {
+            if(result.length == 0){
+                res.json(3)
+            }
+            else {
+                var dbPassword = result[0].password;
+                if(dbPassword == userPassword){
+                    var tokenKey = "f@i#n%tne#ckfhlafkd0102test!@#%"
+                    jwt.sign(
+                      {
+                          userId : result[0].id,
+                          userEmail : result[0].email
+                      },
+                      tokenKey,
+                      {
+                          expiresIn : '10d',
+                          issuer : 'fintech.admin',
+                          subject : 'user.login.info'
+                      },
+                      function(err, token){
+                          console.log('로그인 성공', token)
+                          res.json(token)
+                      }
+                    )            
+                }
+                else {
+                    res.json(2);
+                }
+            }
+        }
+    })
 })
 
 
